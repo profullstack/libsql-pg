@@ -58,6 +58,7 @@ const tx = await db.transaction('write'); await tx.execute(...); await tx.commit
 | `lower(hex(randomblob(16)))`, `hex(randomblob(n))` | `encode(gen_random_bytes(n), 'hex')` |
 | `group_concat(x, sep)` | `string_agg(x::text, sep)` |
 | `ifnull(a, b)` | `coalesce(a, b)` |
+| `x LIKE y` | `x ILIKE y` (SQLite's LIKE is case-insensitive; `NOT LIKE` and `ESCAPE` kept) |
 | `CAST(x AS INTEGER)` | `CAST(x AS BIGINT)` (SQLite's integer is 64-bit) |
 | `` `backticked` `` identifiers | `"quoted"` |
 | `PRAGMA ...` | no-op, empty result |
