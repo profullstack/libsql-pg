@@ -154,9 +154,12 @@ function convertColumnConstraints(constraints, { type, ctx, opts }) {
 /** Remove a DEFAULT clause (a literal or a parenthesised expression). */
 function stripDefault(c) {
   const mask = codeMask(c);
-  const m = /(?<!\bby)\sdefault\s+/i.exec(mask);
+  const m = /(?<!\bby)\sdefault(?=\s)/i.exec(mask);
   if (!m) return c;
+  // The mask blanks string literals to spaces, so the gap after DEFAULT is
+  // measured on the text: `default 'x' check (...)` must not skip past 'x'.
   let end = m.index + m[0].length;
+  end += /^\s*/.exec(c.slice(end))[0].length;
   if (mask[end] === '(') end = matchParen(mask, end) + 1;
   else {
     const rest = /^('[^']*(?:''[^']*)*'|[^\s]+)/.exec(c.slice(end));
@@ -175,9 +178,10 @@ function stripDefault(c) {
  */
 function rewriteDefault(c, type, ctx, notes) {
   const mask = codeMask(c);
-  const m = /(?<!\bby)\sdefault\s+/i.exec(mask);
+  const m = /(?<!\bby)\sdefault(?=\s)/i.exec(mask);
   if (!m) return c;
-  const start = m.index + m[0].length;
+  let start = m.index + m[0].length;
+  start += /^\s*/.exec(c.slice(start))[0].length; // see stripDefault: literals are blank in the mask
   let end;
   if (mask[start] === '(') end = matchParen(mask, start) + 1;
   else {
@@ -189,8 +193,10 @@ function rewriteDefault(c, type, ctx, notes) {
   let out = bare;
   const lower = bare.toLowerCase().replace(/\s+/g, '');
   if (type === 'boolean' && /^[01]$/.test(bare)) out = bare === '1' ? 'true' : 'false';
-  else if (lower === 'current_timestamp' || /^datetime\('now'/.test(lower)) out = 'now()';
+  else if (lower === 'current_timestamp' || lower === "datetime('now')") out = 'now()';
   else if (/^strftime\('%y-%m-%dt%h:%m:%[fs]z?','now'\)$/.test(lower)) out = 'now()';
+  // datetime('now', '+7 days') and friends keep their modifiers: the function
+  // rewriter turns them into now() + interval '7 days'.
   else out = rewriteFunctions(bare);
   if (/gen_random_bytes/.test(out)) ctx.usesPgcrypto = true;
   // to_char(...) as a default on a text column is fine; on timestamptz it is not.
