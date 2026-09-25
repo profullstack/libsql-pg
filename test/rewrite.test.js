@@ -182,9 +182,9 @@ describe('ids, strings and aggregates', () => {
   test('REGEXP -> ~', () => {
     assert.equal(sql("select * from t where a regexp '^x'"), "select * from t where a ~ '^x'");
   });
-  test('LIMIT -1 -> LIMIT ALL; LIMIT ? OFFSET ? untouched; LIKE untouched', () => {
+  test('LIMIT -1 -> LIMIT ALL; LIMIT ? OFFSET ? untouched', () => {
     assert.equal(sql('select * from t limit -1'), 'select * from t LIMIT ALL');
-    assert.equal(sql("select * from t where a like ? limit ? offset ?"), "select * from t where a like ? limit ? offset ?");
+    assert.equal(sql("select * from t where a like ? limit ? offset ?"), "select * from t where a ILIKE ? limit ? offset ?");
   });
   test('INDEXED BY hints are dropped', () => {
     assert.equal(sql('select * from t indexed by t_idx where a = ?'), 'select * from t where a = ?');
