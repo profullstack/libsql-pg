@@ -1,0 +1,73 @@
+{
+  "name": "@profullstack/libsql-pg",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Drop-in replacement for @libsql/client that talks to Postgres, plus the tools to move a Turso/libSQL database into it: the same execute/batch/transaction surface, SQLite idioms rewritten on the way through, a schema converter and a row copier.",
+  "keywords": [
+    "libsql",
+    "turso",
+    "sqlite",
+    "postgres",
+    "postgresql",
+    "migration",
+    "port",
+    "adapter",
+    "drop-in",
+    "pg",
+    "schema",
+    "copy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/profullstack/libsql-pg.git"
+  },
+  "homepage": "https://github.com/profullstack/libsql-pg#readme",
+  "bugs": {
+    "url": "https://github.com/profullstack/libsql-pg/issues"
+  },
+  "license": "MIT",
+  "author": "Profullstack, Inc.",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./index.d.ts",
+  "bin": {
+    "libsql-pg": "./bin/libsql-pg.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "index.js",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "test:unit": "node --test test/rewrite.test.js test/bind.test.js test/result.test.js test/errors.test.js test/schema.test.js test/copy-plan.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "peerDependencies": {
+    "@libsql/client": ">=0.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@libsql/client": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@libsql/client": "^0.15.0"
+  }
+}
