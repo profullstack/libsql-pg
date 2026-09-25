@@ -47,7 +47,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test \"test/*.test.js\"",
+    "test": "node --test test/*.test.js",
     "test:unit": "node --test test/rewrite.test.js test/bind.test.js test/result.test.js test/errors.test.js test/schema.test.js test/copy-plan.test.js"
   },
   "engines": {
