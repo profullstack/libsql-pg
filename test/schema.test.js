@@ -71,6 +71,16 @@ describe('CREATE TABLE', () => {
     assert.match(out, /i double precision default 0\.5/i);
     assert.match(out, /j bigint default \(extract\(epoch from now\(\)\)::bigint\)/i);
   });
+
+  test('keeps a literal DEFAULT that is followed by CHECK, and datetime modifiers in a default', () => {
+    const out = convertSchema(
+      "create table m (role text not null default 'viewer' check (role in ('owner','viewer')), expires_at text not null default (datetime('now','+7 days')), n integer default 0 check (n >= 0))",
+    );
+    assert.match(out, /role text not null default 'viewer' check \(role in \('owner','viewer'\)\)/i);
+    assert.doesNotMatch(out, /\(check\)/i);
+    assert.match(out, /expires_at timestamptz not null default \(now\(\) \+ interval '7 days'\)/i);
+    assert.match(out, /n bigint default 0 check \(n >= 0\)/i);
+  });
   test('a TEXT column with a current-time default is promoted to timestamptz unless told not to', () => {
     assert.match(strip(one("create table p (t text default (datetime('now')))")), /t timestamptz/);
     assert.match(strip(one("create table p (t text default (datetime('now')))", { promoteTextTimestamps: false })), /t text default now\(\)/i);
