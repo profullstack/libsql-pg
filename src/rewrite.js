@@ -430,6 +430,9 @@ export function rewriteFunctions(sql) {
     return `string_agg(${distinct ? 'distinct ' : ''}(${first})::text, ${sep})`;
   });
   sql = replaceCode(sql, /\bifnull\s*\(/gi, 'coalesce(');
+  // SQLite's LIKE is case-insensitive (ASCII); Postgres's is not. ILIKE keeps the
+  // meaning every LIKE in a SQLite app relied on (NOT LIKE -> NOT ILIKE, ESCAPE kept).
+  sql = replaceCode(sql, /\blike\b/gi, 'ILIKE');
   sql = replaceCalls(sql, 'instr', ({ args }) => (args.length === 2 ? `position(${args[1].trim()} in ${args[0].trim()})` : null));
   sql = replaceCalls(sql, 'max', ({ args }) => (args.length >= 2 ? `greatest(${args.map((a) => a.trim()).join(', ')})` : null));
   sql = replaceCalls(sql, 'min', ({ args }) => (args.length >= 2 ? `least(${args.map((a) => a.trim()).join(', ')})` : null));

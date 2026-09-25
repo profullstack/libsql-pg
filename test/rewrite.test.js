@@ -163,6 +163,10 @@ describe('ids, strings and aggregates', () => {
     assert.equal(sql("select group_concat(name, ' | ') from t"), "select string_agg((name)::text, ' | ') from t");
     assert.equal(sql("select group_concat(distinct name, ', ') from t"), "select string_agg(distinct (name)::text, ', ') from t");
   });
+  test('LIKE -> ILIKE (SQLite LIKE is case-insensitive), literals untouched', () => {
+    assert.equal(sql("select 1 from t where a like ? and b not like 'x%' escape '\\'"), "select 1 from t where a ILIKE ? and b not ILIKE 'x%' escape '\\'");
+    assert.equal(sql("select 'I like it' from t where c ilike ?"), "select 'I like it' from t where c ilike ?");
+  });
   test('ifnull -> coalesce, instr -> position', () => {
     assert.equal(sql('select ifnull(a, b), instr(a, b) from t'), 'select coalesce(a, b), position(b in a) from t');
   });
