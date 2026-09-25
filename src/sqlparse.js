@@ -281,3 +281,40 @@ export function literalValue(text) {
   if (!/^'.*'$/s.test(t)) return null;
   return t.slice(1, -1).replace(/''/g, "'");
 }
+
+
+/**
+ * Drop `-- ...` and `/* ... *\/` comments outside string literals and quoted
+ * identifiers. Column definitions with a trailing comment otherwise parse the
+ * comment as a column named `--`.
+ * @param {string} sql
+ */
+export function stripComments(sql) {
+  let out = '';
+  let i = 0;
+  const len = sql.length;
+  while (i < len) {
+    const c = sql[i];
+    if (c === "'" || c === '"' || c === '`') {
+      let j = i + 1;
+      while (j < len) {
+        if (sql[j] === c) {
+          if (c === "'" && sql[j + 1] === "'") { j += 2; continue; }
+          break;
+        }
+        j++;
+      }
+      out += sql.slice(i, Math.min(j + 1, len));
+      i = j + 1;
+    } else if (c === '-' && sql[i + 1] === '-') {
+      while (i < len && sql[i] !== '\n') i++;
+    } else if (c === '/' && sql[i + 1] === '*') {
+      const end = sql.indexOf('*/', i + 2);
+      i = end === -1 ? len : end + 2;
+    } else {
+      out += c;
+      i++;
+    }
+  }
+  return out;
+}

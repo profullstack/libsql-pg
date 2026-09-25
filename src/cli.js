@@ -79,7 +79,7 @@ export async function main(argv, io = {}) {
     });
     if (typeof flags.out === 'string') {
       await writeFile(flags.out, converted);
-      err(`wrote ${flags.out} (${converted.split('\n').filter((l) => /TODO/.test(l)).length} TODO line(s))\n`);
+      err(`wrote ${flags.out} (${converted.split('\n').filter((l) => /TODO/.test(l) && !/Review every TODO/.test(l)).length} TODO line(s))\n`);
     } else out(converted);
     return 0;
   }

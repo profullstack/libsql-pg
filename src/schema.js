@@ -1,5 +1,5 @@
 import { rewriteFunctions, rewriteStatement } from './rewrite.js';
-import { codeMask, matchParen, quoteIdent, replaceCode, splitStatements, splitTopLevel, unquote } from './sqlparse.js';
+import { codeMask, matchParen, quoteIdent, replaceCode, splitStatements, splitTopLevel, stripComments, unquote } from './sqlparse.js';
 
 /**
  * SQLite DDL to Postgres DDL.
@@ -523,7 +523,7 @@ export function convertSchema(sql, opts = {}) {
   /** @type {ConvertContext} */
   const ctx = { tables: new Map(), usesPgcrypto: false, notes: [] };
   const out = [];
-  for (const stmt of splitStatements(sql)) {
+  for (const stmt of splitStatements(stripComments(sql))) {
     const converted = convertStatement(stmt, ctx, opts);
     if (converted !== null) out.push(converted);
   }

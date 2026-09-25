@@ -5,4 +5,4 @@ export { positional, named, bind, prepare } from './src/bind.js';
 export { translateError, ftsError } from './src/errors.js';
 export { toResultSet, makeRow, emptyResultSet } from './src/result.js';
 export { copyDatabase, verifyCopy, orderTables, referencedTables, userTables, coerce, insertSql } from './src/copy.js';
-export { splitStatements, codeMask } from './src/sqlparse.js';
+export { splitStatements, codeMask, stripComments } from './src/sqlparse.js';
